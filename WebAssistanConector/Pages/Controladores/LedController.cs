@@ -1,7 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
+﻿// LedController.cs
+// Copyright (C) 2024 Lun4rBoy
+//
+// Licenciado bajo la Licencia Apache, Versión 2.0 (la "Licencia");
+// no puedes usar este archivo excepto en cumplimiento con la Licencia.
+// Puedes obtener una copia de la Licencia en
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// A menos que lo requiera la ley aplicable o se acuerde por escrito,
+// el software distribuido bajo la Licencia se distribuye "TAL CUAL",
+// SIN GARANTÍAS O CONDICIONES DE NINGÚN TIPO, ni explícitas ni implícitas.
+// Consulta la Licencia para conocer el lenguaje específico que rige
+// los permisos y limitaciones bajo la Licencia.
 
-//using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using WebAssistanConector.Clases;
 
