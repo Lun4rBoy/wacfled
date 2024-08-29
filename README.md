@@ -26,6 +26,12 @@ Just try a change from the controller app and press the button to see the actual
 
 None. App is lightweight and ready to go.
 
+## How to use?
+
+Just deploy the app in your prefered machine.
+
+The use is simple but unfortunately I programmed the menu in Spanish. I will add more languages for sure.
+
 ## What to expect in the future?
 
 I will be working continuously on the development, mainly because I am a bit rusty and it has been a very entertaining and educational project.
