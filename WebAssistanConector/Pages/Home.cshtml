@@ -1,0 +1,112 @@
+﻿@page
+@model WebAssistanConector.Pages.HomeModel
+@{
+    ViewData["Title"] = "Controlador de LED";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <style>
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .btn {
+            font-size: 18px;
+            margin: 5px;
+        }
+
+        #eventViewer {
+            margin-top: 20px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body style="background-color:#201A23">
+    <div class="container">
+        
+        <div class="row justify-content-center">
+            <h1 class="mt-5 text-center text-white">Controlador de LED</h1>
+        </div>
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-12 col-md-6 mt-4">
+                    <div class="container">
+                        
+                        <form id="ipForm" class="mb-3">
+                            <div class="row justify-content-start">
+                                <div class="col-6 text-end">
+                                    <label for="ipDevice" class="h5 text-white">Ip dispositivo:</label>
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control" id="ipDevice" placeholder="192.168.x.x">
+                                </div>
+                            </div>
+                        </form>
+
+                        <form id="infoForm" class="mb-3">
+                            <button type="submit" class="btn btn-primary w-100" style="background-color:#947EB0; border-color:#947EB0">Ver informacion</button>
+                        </form>
+                        <form id="colorForm" class="mb-3">
+                            <div class="row">
+                                <div class="col">
+                                    <input type="color" id="colorInput" class="w-100 h-100" value="#FFEAEE" style="border-radius:9px;border-color:none" />
+                                </div>
+                                <div class="col">
+                                    <button type="submit" class="btn btn-primary w-100 mt-2" style="background-color:#947EB0; border-color:#947EB0">Cambiar Color</button>
+                                </div>
+                            </div>
+
+                        </form>
+
+                        <form id="speedForm" class="mb-3">
+                            <input type="range" id="speedInput" min="1" max="255" class="form-control-range w-75" style="accent-color:#FFD2D7" />
+                            <button type="submit" class="btn btn-primary w-100 mt-2" style="background-color:#947EB0; border-color:#947EB0">Cambiar Velocidad</button>
+                        </form>
+
+                        <form id="brightnessForm" class="mb-3">
+                            <input type="range" id="brightnessInput" min="1" max="255" class="form-control-range w-75" style="accent-color:#FFD2D7" />
+                            <button type="submit" class="btn btn-primary w-100 mt-2" style="background-color:#947EB0; border-color:#947EB0">Cambiar Brillo</button>
+                        </form>
+
+                        <form id="animationForm" class="mb-3">
+                            <select id="animationSelect" class="form-select w-100 mt-2" style="margin:5px">
+                                <option value="99" selected>Opciones</option>
+                                <option value="0">Mix</option>
+                                <option value="1">Meteor</option>
+                                <option value="2">Breathing</option>
+                                <option value="3">Wave</option>
+                                <option value="4">Catch-up</option>
+                                <option value="5">Static</option>
+                                <option value="6">Stack</option>
+                                <option value="7">Flash</option>
+                                <option value="8">Flow</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary w-100 mt-2" style="background-color:#8062D6; border-color:#8062D6">Cambiar animacion</button>
+                        </form>
+
+                        <form id="toggleForm">
+                            <button type="submit" class="btn btn-danger w-100" style="background-color:#9288F8; border-color:#8062D6">Encender/Apagar</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 mt-4 mb-4">
+                    <div class="container h-100 w-100" id="eventViewer" style="overflow-y:auto; min-height:100px; background-color:#09080A; border-radius: 7% 7% 7% 7%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/controladorLed.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
