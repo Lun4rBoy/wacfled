@@ -28,7 +28,7 @@ None. App is lightweight and ready to go.
 
 ## How to use?
 
-Just deploy the app in your prefered machine.
+Just deploy the app in your prefered machine. Change the ip and port in the appsettings file to the one you are going to use or to your domain address.
 
 The use is simple but unfortunately I programmed the menu in Spanish. I will add more languages for sure.
 
