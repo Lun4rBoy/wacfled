@@ -25,36 +25,104 @@ namespace WebAssistanConector.Clases
 
     public class NetworkDevice
     {
-        public string IPAddress { get; set; }
-        public string HostName { get; set; }
-        public string MacAddress { get; set; }
+        public string? IPAddress { get; set; }
+
     }
 
     public class NetworkScanner
     {
+        private readonly Led _led;
+
+        public NetworkScanner()
+        {
+            _led = new Led();
+        }
+
         public async Task<List<NetworkDevice>> ScanNetwork(string baseIP, int startRange, int endRange)
         {
-            List<NetworkDevice> devices = new List<NetworkDevice>();
+            
+            List<Task<NetworkDevice?>> tasks = new List<Task<NetworkDevice?>>();
 
             for (int i = startRange; i <= endRange; i++)
             {
                 string ipAddress = $"{baseIP}.{i}";
-
-                if (await PingDevice(ipAddress))
-                {
-                    string hostName = GetHostName(ipAddress);
-                    string macAddress = GetMacAddress(ipAddress);
-
-                    devices.Add(new NetworkDevice
-                    {
-                        IPAddress = ipAddress,
-                        HostName = hostName,
-                        MacAddress = macAddress
-                    });
-                }
+                tasks.Add(PingAndGetDevice(ipAddress));
             }
 
-            return devices;
+            // Ejecutar todas las tareas de ping en paralelo y esperar su finalización
+            NetworkDevice?[] devicesArray = await Task.WhenAll(tasks);
+
+            List<NetworkDevice?> ipList = new List<NetworkDevice?>();
+            foreach (var device in devicesArray)
+            {
+                if (device?.IPAddress == null) continue;
+                var test = _led.GetInfoDevice(device.IPAddress);
+                if ( test == "" || test == null || test == string.Empty) continue;
+                ipList.Add(device);
+            }
+            // Filtrar los resultados nulos (direcciones que no respondieron al ping)
+            return ipList.ToList();
+        }
+
+        public async Task<List<NetworkDevice>> ScanNetworkParallelAsync(string baseIP, int startRange, int endRange)
+        {
+            List<Task<NetworkDevice?>> tasks = new List<Task<NetworkDevice?>>();
+
+            // Definir la cantidad máxima de tareas que puedes ejecutar en paralelo
+            int maxDegreeOfParallelism = 10;
+            using (SemaphoreSlim concurrencySemaphore = new SemaphoreSlim(maxDegreeOfParallelism))
+            {
+                for (int i = startRange; i <= endRange; i++)
+                {
+                    string ipAddress = $"{baseIP}.{i}";
+
+                    // Agregar una tarea para ejecutar el ping de manera asíncrona y controlada
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        await concurrencySemaphore.WaitAsync(); // Controlar el número de tareas concurrentes
+                        try
+                        {
+                            if (await PingDevice(ipAddress))
+                            {
+                                var test = _led.GetInfoDevice(ipAddress);
+                                if (!string.IsNullOrEmpty(test))
+                                {
+                                    return new NetworkDevice { IPAddress = ipAddress };
+                                }
+                            }
+                            return null;
+                        }
+                        finally
+                        {
+                            concurrencySemaphore.Release();
+                        }
+                    }));
+                }
+
+                // Ejecutar todas las tareas y esperar a que finalicen
+                NetworkDevice?[] devicesArray = await Task.WhenAll(tasks);
+                return devicesArray.Where(d => d != null).ToList();
+            }
+        }
+
+
+        private async Task<NetworkDevice?> PingAndGetDevice(string ipAddress)
+        {
+            try
+            {
+                if (await PingDevice(ipAddress))
+                {
+                    // Devuelve el dispositivo si responde al ping
+                    return new NetworkDevice
+                    {
+                        IPAddress = ipAddress,
+                    };
+                }
+            }
+            catch{ }
+            
+            // Devuelve null si no responde
+            return null;
         }
 
         private async Task<bool> PingDevice(string ipAddress)
@@ -63,7 +131,7 @@ namespace WebAssistanConector.Clases
             {
                 try
                 {
-                    PingReply reply = await ping.SendPingAsync(ipAddress, 100);
+                    PingReply reply = await ping.SendPingAsync(ipAddress, 100); // Timeout de 100ms
                     return reply.Status == IPStatus.Success;
                 }
                 catch
@@ -72,6 +140,7 @@ namespace WebAssistanConector.Clases
                 }
             }
         }
+
 
         private string GetHostName(string ipAddress)
         {

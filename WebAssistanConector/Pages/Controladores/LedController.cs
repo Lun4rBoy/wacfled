@@ -30,7 +30,10 @@ namespace WebAssistanConector.Pages
         public LedController()
         {
             _led = new Led(); // IP ya está configurada en la clase Led
+            _networkScanner = new NetworkScanner();
         }
+
+
 
         public class DeviceValues
         {
@@ -105,11 +108,23 @@ namespace WebAssistanConector.Pages
             return Ok(new { message = info });
         }
 
+        [HttpPost("devices")]
         public async Task<IActionResult> GetIps()
         {
-           var devices = await _networkScanner.ScanNetwork("192.168.1",1,254);
-            string json = JsonSerializer.Serialize(devices, new JsonSerializerOptions { WriteIndented = true });
-            return Ok(json);
+            List<NetworkDevice>? devices = null;
+            string json = string.Empty ;
+            try
+            {
+                devices = await _networkScanner.ScanNetwork("192.168.1", 1, 254);
+                json = JsonSerializer.Serialize(devices, new JsonSerializerOptions { WriteIndented = true });
+            }
+            catch (Exception ex)
+            {
+                json = ex.Message;
+            }
+           
+            
+            return Ok(new { message = json });
         }
     }
 

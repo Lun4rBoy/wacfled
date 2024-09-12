@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const footer = document.getElementById("animatedFooter");
     const ipDevice = document.getElementById("ipDevice");
 
+    //const botonTest = document.getElementById("botonTest");
+
+    
+
+
     const gifUrl = "https://i.gifer.com/Y3il.gif";
 
     const gifImage = document.createElement("img");
@@ -111,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 Values: value,
                 Ip: ipDevice.value
             };
-            if (ipDevice.value == '') {
+            if (ipDevice.value == '' && endpoint != "devices") {
                 appendMessage("Error: No se ingreso una ip!");
                 return;
             }
@@ -122,10 +127,14 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             const result = await response.json();
+            if (endpoint === "devices") {
+                return await result;
+            }
             appendMessage(result.message);
         } catch (error) {
             appendMessage(`Error: ${error.message}`);
         }
+        
     }
 
     colorForm.addEventListener("submit", function (event) {
@@ -162,5 +171,34 @@ document.addEventListener("DOMContentLoaded", function () {
         sendRequest("info", "0");
     });
 
+    /*botonTest.addEventListener("submit", function () {
+        event.preventDefault();
+        sendRequest("devices", "0");
+    });*/
 
+    async function getIps() {
+        try { 
+        var response = await sendRequest("devices", "0");
+        var ips = JSON.parse(response.message);
+
+            if (ips.length > 0) {
+                ipDevice.innerHTML = "";
+                ips.forEach(ip => {
+                    const op = document.createElement("option");
+                    op.value = ip.IPAddress;
+                    op.text = ip.IPAddress;
+                    ipDevice.appendChild(op);
+                });
+            } else {
+                ipDevice.innerHTML = "";
+                const op = document.createElement("option");
+                op.text = "Devices not found";
+                ipDevice.appendChild(op);
+            }
+        } catch (error) {
+            console.error("Error obteniendo las IPs:", error);
+            }
+    }
+
+    getIps();
 });

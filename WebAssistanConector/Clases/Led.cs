@@ -31,6 +31,9 @@ namespace WebAssistanConector.Clases
                 {
                     byte[] data = StringToByteArray(hexCommand);
                     stream.Write(data, 0, data.Length);
+                    string? isVoid = hexCommand.Substring(8, 2);
+
+                    if ( isVoid != "10") return null;
 
                     // Leer la respuesta
                     byte[] responseBuffer = new byte[256]; // Ajusta el tamaño del buffer si es necesario
