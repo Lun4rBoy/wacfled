@@ -49,6 +49,11 @@ namespace WebAssistanConector.Pages
                 return BadRequest(new { message = "Invalid color format. Must be 6 hex characters." });
             }
 
+            if (string.IsNullOrEmpty(d.Ip))
+            {
+                return BadRequest(new { message = "IP address is required." });
+            }
+
             _led.ChangeColor(d.Values, d.Ip);
             return Ok(new {message = "Color changed successfully." });
         }
@@ -56,8 +61,18 @@ namespace WebAssistanConector.Pages
         [HttpPost("change-speed")]
         public IActionResult ChangeSpeed([FromBody] DeviceValues d)
         {
+            if (string.IsNullOrEmpty(d.Values))
+            {
+                return BadRequest(new { message = "Speed value is required." });
+            }
+
+            if (string.IsNullOrEmpty(d.Ip))
+            {
+                return BadRequest(new { message = "IP address is required." });
+            }
+
             var speed = Int32.Parse(d.Values);
-            if (speed< 0 || speed > 255)
+            if (speed < 0 || speed > 255)
             {
                 return BadRequest(new { message = "Speed must be between 0 and 255." });
             }
@@ -69,6 +84,16 @@ namespace WebAssistanConector.Pages
         [HttpPost("change-animation")]
         public IActionResult ChangeAnimation([FromBody] DeviceValues d)
         {
+            if (string.IsNullOrEmpty(d.Values))
+            {
+                return BadRequest(new { message = "Animation value is required." });
+            }
+
+            if (string.IsNullOrEmpty(d.Ip))
+            {
+                return BadRequest(new { message = "IP address is required." });
+            }
+
             var animation = Int32.Parse(d.Values);
             _led.ChangeAnimation(animation, d.Ip);
             return Ok(new { message = "Animation changed successfully." });
@@ -77,6 +102,16 @@ namespace WebAssistanConector.Pages
         [HttpPost("change-brightness")]
         public IActionResult ChangeBrightness([FromBody] DeviceValues d)
         {
+            if (string.IsNullOrEmpty(d.Values))
+            {
+                return BadRequest(new { message = "Brightness value is required." });
+            }
+
+            if (string.IsNullOrEmpty(d.Ip))
+            {
+                return BadRequest(new { message = "IP address is required." });
+            }
+
             var brightness = Int32.Parse(d.Values);
             if (brightness < 0 || brightness > 255)
             {
@@ -90,8 +125,13 @@ namespace WebAssistanConector.Pages
         [HttpPost("toggle")]
         public IActionResult ToggleDevice([FromBody] DeviceValues d)
         {
+            if (string.IsNullOrEmpty(d.Ip))
+            {
+                return BadRequest(new { message = "IP address is required." });
+            }
+
             var info = _led.ToggleDevice(d.Ip);
-            if (info==null) return BadRequest(new { message = "Dispositivo no responde." });
+            if (info == null) return BadRequest(new { message = "Dispositivo no responde." });
             string response = string.Empty;
 
             if (info == true) response = "Dispositivo encendido";
@@ -103,8 +143,13 @@ namespace WebAssistanConector.Pages
         [HttpPost("info")]
         public IActionResult InfoDevice([FromBody] DeviceValues d)
         {
+            if (string.IsNullOrEmpty(d.Ip))
+            {
+                return BadRequest(new { message = "IP address is required." });
+            }
+
             var info = _led.GetInfoDevice(d.Ip);
-            if (info == null || info == "") return BadRequest( new {message="Dispositivo no responde."});
+            if (info == null || info == "") return BadRequest(new {message="Dispositivo no responde."});
             return Ok(new { message = info });
         }
 

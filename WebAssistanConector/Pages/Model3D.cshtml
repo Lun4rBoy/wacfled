@@ -1,0 +1,53 @@
+@page
+@model WebAssistanConector.Pages.Model3DModel
+@{
+    ViewData["Title"] = "Modelo 3D";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modelo 3D - CRT Monitor</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            padding: 10px 20px;
+            background-color: #947EB0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .back-button:hover {
+            background-color: #8062D6;
+            color: white;
+        }
+    </style>
+</head>
+<body style="background-color: #000;">
+    <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+    <div id="model3d-container"></div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/examples/jsm/controls/OrbitControls": "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js"
+        }
+    }
+    </script>
+    <script type="module" src="~/js/model3d.js"></script>
+</body>
+</html> 

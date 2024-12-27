@@ -1,7 +1,7 @@
 // controladorLed.js
 // Copyright (C) 2024 Lun4rBoy
 //
-// Licenciado bajo la Licencia Apache, Versión 2.0 (la "Licencia");
+// Licenciado bajo la Licencia Apache, Versiï¿½n 2.0 (la "Licencia");
 // no puedes usar este archivo excepto en cumplimiento con la Licencia.
 // Puedes obtener una copia de la Licencia en
 //
@@ -9,8 +9,8 @@
 //
 // A menos que lo requiera la ley aplicable o se acuerde por escrito,
 // el software distribuido bajo la Licencia se distribuye "TAL CUAL",
-// SIN GARANTÍAS O CONDICIONES DE NINGÚN TIPO, ni explícitas ni implícitas.
-// Consulta la Licencia para conocer el lenguaje específico que rige
+// SIN GARANTï¿½AS O CONDICIONES DE NINGï¿½N TIPO, ni explï¿½citas ni implï¿½citas.
+// Consulta la Licencia para conocer el lenguaje especï¿½fico que rige
 // los permisos y limitaciones bajo la Licencia.
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -27,6 +27,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const infoForm = document.getElementById("infoForm");
     const footer = document.getElementById("animatedFooter");
     const ipDevice = document.getElementById("ipDevice");
+    const ipSelect = document.getElementById('ipDevice');
+    const manualIpInput = document.getElementById('manualIp');
+    const refreshButton = document.getElementById('refreshIps');
 
     //const botonTest = document.getElementById("botonTest");
 
@@ -75,19 +78,19 @@ document.addEventListener("DOMContentLoaded", function () {
     function adjustAnimation() {
         footerWidth = footer.offsetWidth;
         gifWidth = gifImage.offsetWidth;
-        pos = Math.min(pos, footerWidth - gifWidth); // Ajustar la posición para que no se desborde
+        pos = Math.min(pos, footerWidth - gifWidth); // Ajustar la posiciï¿½n para que no se desborde
     }
 
     function animate() {
         if (pos + gifWidth > footerWidth || pos < 0) {
-            direction *= -1; // Cambiar la dirección
+            direction *= -1; // Cambiar la direcciï¿½n
             gifImage.style.transform = `scaleX(${direction})`;
         }
 
         pos += speed * direction;
         gifImage.style.left = `${pos}px`;
 
-        animationFrameId = requestAnimationFrame(animate); // Llama a la función en el siguiente ciclo de animación
+        animationFrameId = requestAnimationFrame(animate); // Llama a la funciï¿½n en el siguiente ciclo de animaciï¿½n
     }
 
     window.addEventListener("resize", () => {
@@ -96,14 +99,14 @@ document.addEventListener("DOMContentLoaded", function () {
         startAnimation();
     });
 
-    // Iniciar la animación
+    // Iniciar la animaciï¿½n
     gifImage.onload = startAnimation;
 
 
     function appendMessage(message) {
         eventViewer.innerHTML = "";
         const p = document.createElement("p");
-        // Reemplaza los saltos de línea con <br>
+        // Reemplaza los saltos de lï¿½nea con <br>
         p.innerHTML = message.replace(/\n/g, '<br>');
         p.style.color = "white"
         eventViewer.appendChild(p);
@@ -130,9 +133,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (endpoint === "devices") {
                 return await result;
             }
-            appendMessage(result.message);
+            appendToEventViewer(result.message);
         } catch (error) {
-            appendMessage(`Error: ${error.message}`);
+            appendToEventViewer(`Error: ${error.message}`);
         }
         
     }
@@ -166,9 +169,12 @@ document.addEventListener("DOMContentLoaded", function () {
         sendRequest("change-animation", `${animation}`);
     });
 
-    infoForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        sendRequest("info", "0");
+    infoForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        try {
+            const response = await sendRequest("info", getSelectedIp());
+        } catch (error) {
+        }
     });
 
     /*botonTest.addEventListener("submit", function () {
@@ -178,27 +184,85 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function getIps() {
         try { 
-        var response = await sendRequest("devices", "0");
-        var ips = JSON.parse(response.message);
+            var response = await sendRequest("devices", "0");
+            var ips = JSON.parse(response.message);
+
+            // Mantener la opciÃ³n manual y limpiar el resto del select
+            ipDevice.innerHTML = '<option value="manual">Ingreso manual</option>';
 
             if (ips.length > 0) {
-                ipDevice.innerHTML = "";
-                ips.forEach(ip => {
+                ips.forEach((ip, index) => {
                     const op = document.createElement("option");
                     op.value = ip.IPAddress;
                     op.text = ip.IPAddress;
+                    // Seleccionar automÃ¡ticamente la primera IP encontrada
+                    if (index === 0) {
+                        op.selected = true;
+                    }
                     ipDevice.appendChild(op);
                 });
             } else {
-                ipDevice.innerHTML = "";
                 const op = document.createElement("option");
                 op.text = "Devices not found";
+                op.selected = true;
                 ipDevice.appendChild(op);
             }
         } catch (error) {
             console.error("Error obteniendo las IPs:", error);
-            }
+            ipDevice.innerHTML = '<option value="manual">Ingreso manual</option><option selected>Devices not found</option>';
+        }
     }
 
     getIps();
+
+    // Asegurarnos de que los elementos existen antes de agregar los listeners
+    if (ipSelect && manualIpInput && refreshButton) {
+        // Manejar cambio en el select
+        ipSelect.addEventListener('change', function() {
+            if (this.value === 'manual') {
+                manualIpInput.classList.remove('d-none');
+                ipSelect.classList.add('d-none');
+            }
+        });
+
+        // Agregar botÃ³n para volver al select
+        manualIpInput.addEventListener('keydown', function(e) {
+            // Si presiona Escape, vuelve al select
+            if (e.key === 'Escape') {
+                manualIpInput.classList.add('d-none');
+                ipSelect.classList.remove('d-none');
+                ipSelect.value = ipSelect.options[1].value;
+            }
+        });
+
+        // Manejar el botÃ³n de refresh
+        refreshButton.addEventListener('click', function() {
+            // Asegurarse de mostrar el select y ocultar el input manual
+            manualIpInput.classList.add('d-none');
+            ipSelect.classList.remove('d-none');
+            
+            ipSelect.innerHTML = '<option value="manual">Ingreso manual</option><option selected>Searching...</option>';
+            getIps(); // Usar la funciÃ³n getIps que ya existe en tu cÃ³digo
+        });
+    }
+
+    // FunciÃ³n para obtener la IP seleccionada
+    window.getSelectedIp = function() {
+        if (!manualIpInput.classList.contains('d-none')) {
+            return manualIpInput.value;
+        }
+        return ipSelect.value;
+    }
+
+    function appendToEventViewer(message) {
+        // Asegurarse de que el mensaje termine con un salto de lÃ­nea
+        if (!message.endsWith('\n')) {
+            message += '\n';
+        }
+        
+        // Si existe la funciÃ³n typeWriter, mostrar en el monitor 3D
+        if (typeof typeWriter === 'function') {
+            typeWriter(message);
+        }
+    }
 });
