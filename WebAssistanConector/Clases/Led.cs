@@ -26,11 +26,14 @@ namespace WebAssistanConector.Clases
             {
                 string response = string.Empty;
 
-                using (TcpClient client = new TcpClient(ControllerIp, 8189))
-                using (NetworkStream stream = client.GetStream())
+                using var client = new TcpClient(ControllerIp, 8189);
+                using var stream = client.GetStream();
                 {
                     byte[] data = StringToByteArray(hexCommand);
                     stream.Write(data, 0, data.Length);
+                    string? isVoid = hexCommand.Substring(8, 2);
+
+                    if ( isVoid != "10" && isVoid != "AA") return null;
 
                     // Leer la respuesta
                     byte[] responseBuffer = new byte[256]; // Ajusta el tamaño del buffer si es necesario
@@ -45,7 +48,7 @@ namespace WebAssistanConector.Clases
                     return ParseResponse(response);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
